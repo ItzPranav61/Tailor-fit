@@ -65,6 +65,12 @@ OPENAI_MODEL=gpt-5.4-mini
 
 For the default Gemini setup, only `GEMINI_API_KEY` is required. OpenAI support exists for optional local experiments if `LLM_PROVIDER=openai`, but it is not required.
 
+Tailor Fit uses the real Gemini API by default. If Gemini returns a confirmed
+quota or rate-limit `429`, the app may show a clearly labeled offline demo
+fallback so the hackathon flow remains reviewable. That fallback is limited to
+the built-in BuildNest/Aaspas Web Developer Intern sample and is not a
+replacement for the real AI tailoring path.
+
 5. Start the dev server:
 
 ```bash
@@ -105,6 +111,8 @@ Real `.env` and `.env.local` files are ignored by git.
 
 - Gemini free-tier models can return temporary rate-limit or high-demand errors.
 - The fallback model uses the same Gemini API key, so it can still fail if that key has no quota for the fallback model.
+- If Gemini quota is exhausted, Tailor Fit can return a clearly labeled offline
+  demo fallback using only the built-in sample content.
 - Tailor Fit does not store resumes, add authentication, or provide file upload in this MVP.
 - The AI output should still be reviewed by the user before sending a job application.
 

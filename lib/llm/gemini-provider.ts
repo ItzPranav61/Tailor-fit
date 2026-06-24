@@ -8,13 +8,36 @@ import {
   parseJsonObject,
   tailorResultSchema,
 } from "./shared";
-import type { LlmProvider, TailorRequest } from "./types";
+import type { LlmProvider, TailorRequest, TailorResult } from "./types";
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL;
 const MAX_ATTEMPTS = 3;
 const BACKOFF_MS = [500, 1_000, 2_000];
 const EMPTY_RESPONSE_ERROR = "Gemini returned an empty response.";
+const OFFLINE_DEMO_NOTICE =
+  "Offline demo fallback shown because AI quota is temporarily unavailable.";
+
+const offlineDemoFallback: TailorResult = {
+  tailoredResume: `${OFFLINE_DEMO_NOTICE}
+
+Pranav Sawant
+
+Experience
+- Built BuildNest, a deployed opportunity board for student developers using Next.js, Tailwind CSS, Supabase, PostgreSQL, and Vercel.
+- Added search and filtering for opportunities and created detail pages with external links, supporting practical web application workflows.
+- Worked on Aaspas, a hyperlocal community app with locality onboarding, local posts, groups, and business discovery.
+
+Education
+- BSc IT 2nd Year Student, Maharashtra`,
+  changeNotes: [
+    OFFLINE_DEMO_NOTICE,
+    "Emphasized BuildNest as a deployed Next.js and Tailwind CSS web application because the Web Developer Intern role asks for frontend development and deployed projects.",
+    "Highlighted Supabase and PostgreSQL as database integration evidence already present in the sample resume.",
+    "Kept React as indirectly supported through Next.js context only; the fallback does not claim standalone React experience.",
+    "Preserved the Aaspas project, education, tools, and project scope without adding fake metrics, skills, titles, or experience.",
+  ],
+};
 
 const geminiResponseSchema = {
   type: Type.OBJECT,
@@ -75,6 +98,78 @@ function isRetryableGeminiError(error: unknown) {
   );
 }
 
+function isGeminiQuotaError(error: unknown) {
+  const summary = getErrorSummary(error);
+  const message = summary.message.toLowerCase();
+  const status = Number(summary.status);
+  const code = Number(summary.code);
+
+  return (
+    (status === 429 || code === 429) &&
+    /quota|rate.?limit|resource_exhausted/.test(message)
+  );
+}
+
+function getErrorSummary(error: unknown) {
+  const errorObject =
+    typeof error === "object" && error !== null
+      ? (error as {
+          code?: unknown;
+          message?: unknown;
+          name?: unknown;
+          status?: unknown;
+        })
+      : undefined;
+
+  const name =
+    error instanceof Error
+      ? error.name
+      : typeof errorObject?.name === "string"
+        ? errorObject.name
+        : typeof error;
+
+  const status =
+    errorObject && "status" in errorObject ? errorObject.status : undefined;
+  const code =
+    errorObject && "code" in errorObject ? errorObject.code : undefined;
+
+  const rawMessage =
+    error instanceof Error
+      ? error.message
+      : typeof errorObject?.message === "string"
+        ? errorObject.message
+        : String(error);
+
+  return {
+    code,
+    message: rawMessage.slice(0, 200),
+    name,
+    status,
+  };
+}
+
+function logGeminiFailure(
+  label: string,
+  error: unknown,
+  model: string,
+  attempt?: number,
+) {
+  console.warn("[Tailor Fit] Gemini provider failure", {
+    attempt,
+    error: getErrorSummary(error),
+    label,
+    model,
+  });
+}
+
+function logOfflineFallback(error: unknown, model: string) {
+  console.warn("[Tailor Fit] Using offline demo fallback", {
+    error: getErrorSummary(error),
+    model,
+    reason: "Gemini quota or rate limit exhausted.",
+  });
+}
+
 export class GeminiProvider implements LlmProvider {
   async tailor(input: TailorRequest) {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -93,14 +188,35 @@ export class GeminiProvider implements LlmProvider {
         GEMINI_FALLBACK_MODEL === GEMINI_MODEL ||
         !isRetryableGeminiError(error)
       ) {
+        if (isGeminiQuotaError(error)) {
+          logOfflineFallback(error, GEMINI_MODEL);
+          return offlineDemoFallback;
+        }
+
         throw error;
       }
 
       console.warn(
-        "Gemini primary model failed with retryable errors; trying fallback model once.",
+        `[Tailor Fit] Trying Gemini fallback model: ${GEMINI_FALLBACK_MODEL}`,
       );
 
-      return this.tailorOnce(client, input, GEMINI_FALLBACK_MODEL);
+      try {
+        return await this.tailorOnce(client, input, GEMINI_FALLBACK_MODEL);
+      } catch (fallbackError) {
+        logGeminiFailure(
+          "fallback",
+          fallbackError,
+          GEMINI_FALLBACK_MODEL,
+          1,
+        );
+
+        if (isGeminiQuotaError(fallbackError)) {
+          logOfflineFallback(fallbackError, GEMINI_FALLBACK_MODEL);
+          return offlineDemoFallback;
+        }
+
+        throw fallbackError;
+      }
     }
   }
 
@@ -113,6 +229,8 @@ export class GeminiProvider implements LlmProvider {
       try {
         return await this.tailorOnce(client, input, model);
       } catch (error) {
+        logGeminiFailure("primary", error, model, attempt);
+
         const shouldRetry =
           attempt < MAX_ATTEMPTS && isRetryableGeminiError(error);
 
@@ -120,9 +238,11 @@ export class GeminiProvider implements LlmProvider {
           throw error;
         }
 
-        console.warn(
-          `Gemini provider attempt ${attempt} failed with a transient error; retrying.`,
-        );
+        console.warn("[Tailor Fit] Gemini retry scheduled", {
+          attempt,
+          backoffMs: BACKOFF_MS[attempt - 1],
+          model,
+        });
 
         await sleep(BACKOFF_MS[attempt - 1]);
       }

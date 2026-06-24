@@ -59,8 +59,10 @@ export async function POST(request: Request) {
     const result = await getLlmProvider().tailor(parsedRequest.data);
 
     return NextResponse.json(result, { status: 200 });
-  } catch (error) {
-    console.error("Tailor API LLM provider failure", error);
+  } catch {
+    console.error(
+      "Tailor API LLM provider failure; returning safe 502 response. See provider logs for details.",
+    );
 
     return NextResponse.json(
       {

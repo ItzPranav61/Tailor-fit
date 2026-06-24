@@ -12,8 +12,12 @@
 
 body {
   margin: 0;
-  background: #f7f5ef;
-  color: #18181b;
+  background: #fbf6ea;
+  color: #15140f;
+  font-feature-settings:
+    "cv02" 1,
+    "cv03" 1,
+    "cv04" 1;
 }
 
 button,
@@ -23,7 +27,7 @@ textarea {
 
 textarea,
 [class*="overflow-auto"] {
-  scrollbar-color: #34d399 #f1f5f9;
+  scrollbar-color: #34d399 #f3eadc;
   scrollbar-width: thin;
 }
 
@@ -35,7 +39,7 @@ textarea::-webkit-scrollbar,
 
 textarea::-webkit-scrollbar-track,
 [class*="overflow-auto"]::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f3eadc;
   border-radius: 999px;
 }
 

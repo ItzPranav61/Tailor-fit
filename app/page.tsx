@@ -9,7 +9,7 @@ import {
   Target,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type TailorResponse = {
   tailoredResume: string;
@@ -47,6 +47,12 @@ const heroBadges = [
   "No fake skills",
   "Change notes included",
   "Built for job seekers",
+];
+
+const trustStrip = [
+  "No fake skills invented",
+  "Change notes for every edit",
+  "Built for serious job seekers",
 ];
 
 const howItWorks = [
@@ -93,8 +99,35 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [showCopyToast, setShowCopyToast] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const canSubmit = resume.trim().length > 0 && jobDescription.trim().length > 0;
+
+  useEffect(() => {
+    function updateScrollProgress() {
+      const scrollableHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      if (scrollableHeight <= 0) {
+        setScrollProgress(0);
+        return;
+      }
+
+      setScrollProgress(
+        Math.min(100, Math.max(0, (window.scrollY / scrollableHeight) * 100)),
+      );
+    }
+
+    updateScrollProgress();
+    window.addEventListener("scroll", updateScrollProgress, { passive: true });
+    window.addEventListener("resize", updateScrollProgress);
+
+    return () => {
+      window.removeEventListener("scroll", updateScrollProgress);
+      window.removeEventListener("resize", updateScrollProgress);
+    };
+  }, []);
 
   function resetOutputState() {
     setTailoredResume("");
@@ -171,7 +204,11 @@ export default function Home() {
     try {
       await navigator.clipboard.writeText(tailoredResume);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
+      setShowCopyToast(true);
+      window.setTimeout(() => {
+        setCopied(false);
+        setShowCopyToast(false);
+      }, 1800);
     } catch {
       setError("Copy failed. Please select and copy the tailored resume text.");
     }
@@ -194,40 +231,43 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f5ef] text-slate-950">
-      <nav className="sticky top-0 z-20 border-b border-slate-200/80 bg-[#f7f5ef]/95 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+    <main className="min-h-screen bg-[#fbf6ea] text-[#15140f]">
+      <div className="fixed inset-x-0 top-0 z-50 h-0.5 bg-[#e8dfcf]">
+        <div
+          className="h-full bg-emerald-400 transition-[width] duration-150 ease-out"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
+
+      {showCopyToast ? (
+        <div
+          className="fixed right-4 top-20 z-50 rounded-md border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-emerald-800 shadow-lg shadow-slate-900/10"
+          role="status"
+        >
+          Tailored resume copied.
+        </div>
+      ) : null}
+
+      <nav className="sticky top-0 z-40 border-b border-[#e8dfcf]/90 bg-[#fbf6ea]/95 px-4 py-3 backdrop-blur sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-12 max-w-6xl items-center justify-between gap-4">
           <a className="flex items-center gap-3" href="#">
-            <span className="grid h-9 w-9 place-items-center rounded-md border border-emerald-200 bg-emerald-50 shadow-sm">
-              <svg
-                aria-hidden="true"
-                className="h-6 w-6 text-emerald-700"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M6 5h12M12 5v14M7 15l3 3 7-8"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2.4"
-                />
-              </svg>
+            <span className="grid h-9 w-9 place-items-center rounded-md bg-[#15140f] text-sm font-semibold tracking-tight text-emerald-200 shadow-sm">
+              TF
             </span>
-            <span className="text-base font-semibold text-slate-950">
+            <span className="text-base font-semibold tracking-tight text-[#15140f]">
               Tailor Fit
             </span>
           </a>
 
           <div className="flex items-center gap-2">
             <a
-              className="lift-on-hover rounded-md px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-white hover:text-slate-950"
+              className="lift-on-hover rounded-md px-3 py-2 text-sm font-semibold text-[#6b665d] hover:bg-white hover:text-[#15140f]"
               href="#demo"
             >
               Demo
             </a>
             <a
-              className="lift-on-hover rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm hover:border-emerald-300 hover:text-emerald-800"
+              className="lift-on-hover rounded-md border border-[#d9cfbd] bg-white/80 px-3 py-2 text-sm font-semibold text-[#15140f] shadow-sm hover:border-emerald-300 hover:text-emerald-800"
               href="https://github.com/ItzPranav61/Tailor-fit"
               rel="noreferrer"
               target="_blank"
@@ -238,17 +278,17 @@ export default function Home() {
         </div>
       </nav>
 
-      <section className="px-4 pb-10 pt-12 sm:px-6 sm:pb-14 sm:pt-16 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)] lg:items-center">
+      <section className="px-4 pb-8 pt-14 sm:px-6 sm:pb-12 sm:pt-20 lg:px-8">
+        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.8fr)] lg:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
               Honest resume tailoring
             </p>
-            <h1 className="mt-4 max-w-4xl text-4xl font-semibold leading-tight tracking-normal text-slate-950 sm:text-5xl lg:text-6xl">
+            <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.04] tracking-normal text-[#15140f] sm:text-6xl lg:text-7xl">
               Tailor your resume to any job description — without faking
               experience.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-700">
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-[#6b665d]">
               Paste your resume and a job description. Tailor Fit rewrites your
               resume to match the role, explains what changed, and keeps your
               experience honest.
@@ -257,7 +297,7 @@ export default function Home() {
             <div className="mt-6 flex flex-wrap gap-2">
               {heroBadges.map((badge) => (
                 <span
-                  className="rounded-full border border-emerald-200 bg-white px-3 py-1 text-xs font-semibold text-emerald-800 shadow-sm"
+                  className="rounded-full border border-emerald-200 bg-white/80 px-3 py-1 text-xs font-semibold text-emerald-800 shadow-sm shadow-slate-900/5"
                   key={badge}
                 >
                   {badge}
@@ -267,13 +307,13 @@ export default function Home() {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
-                className="lift-on-hover inline-flex min-h-12 items-center justify-center rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800"
+                className="lift-on-hover inline-flex min-h-12 items-center justify-center rounded-md bg-[#15140f] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800"
                 href="#demo"
               >
                 Try Demo
               </a>
               <a
-                className="lift-on-hover inline-flex min-h-12 items-center justify-center rounded-md border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-sm hover:border-emerald-300 hover:text-emerald-800"
+                className="lift-on-hover inline-flex min-h-12 items-center justify-center rounded-md border border-[#d9cfbd] bg-white/80 px-6 py-3 text-sm font-semibold text-[#15140f] shadow-sm hover:border-emerald-300 hover:text-emerald-800"
                 href="https://github.com/ItzPranav61/Tailor-fit"
                 rel="noreferrer"
                 target="_blank"
@@ -283,45 +323,45 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/70">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div className="rounded-lg border border-[#e3d8c5] bg-[#fffdf8] p-5 shadow-2xl shadow-[#c8bda8]/25">
+            <div className="flex items-center justify-between border-b border-[#ebe3d6] pb-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
                   Live workflow
                 </p>
-                <p className="mt-1 text-sm font-semibold text-slate-950">
+                <p className="mt-1 text-sm font-semibold text-[#15140f]">
                   Resume rewrite preview
                 </p>
               </div>
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
+              <span className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
                 Honest rewrite
               </span>
             </div>
             <div className="mt-5 space-y-3">
-              <div className="hero-original rounded-md border border-slate-200 bg-slate-50 p-4">
-                <p className="text-xs font-semibold text-slate-500">
+              <div className="hero-original rounded-md border border-[#e3d8c5] bg-[#f6efe2] p-4">
+                <p className="text-xs font-semibold text-[#777168]">
                   Original bullet
                 </p>
-                <p className="mt-2 text-sm leading-6 text-slate-800">
+                <p className="mt-2 text-sm leading-6 text-[#3f3b35]">
                   Built BuildNest using Next.js, Tailwind CSS, Supabase,
                   PostgreSQL, and Vercel.
                 </p>
               </div>
-              <div className="hero-tailored rounded-md border border-emerald-200 bg-emerald-50 p-4">
+              <div className="hero-tailored rounded-md border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
                 <p className="text-xs font-semibold text-emerald-700">
                   Tailored bullet
                 </p>
-                <p className="mt-2 text-sm leading-6 text-slate-900">
+                <p className="mt-2 text-sm leading-6 text-[#15140f]">
                   Developed a deployed Next.js opportunity board with Tailwind
                   CSS, Supabase, PostgreSQL, and Vercel to support practical web
                   application workflows.
                 </p>
               </div>
-              <div className="hero-note rounded-md border border-slate-200 bg-white p-4">
-                <p className="text-xs font-semibold text-slate-500">
+              <div className="hero-note rounded-md border border-[#e3d8c5] bg-white p-4">
+                <p className="text-xs font-semibold text-[#777168]">
                   Change note
                 </p>
-                <p className="mt-2 text-sm leading-6 text-slate-700">
+                <p className="mt-2 text-sm leading-6 text-[#6b665d]">
                   Emphasized deployed web app and database integration because
                   the role asks for practical frontend projects.
                 </p>
@@ -331,39 +371,57 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="px-4 py-6 sm:px-6 lg:px-8" id="demo">
-        <div className="mx-auto max-w-7xl rounded-lg border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/60 sm:p-6 lg:p-8">
+      <section className="border-y border-[#e8dfcf] bg-[#fffaf1]/60 px-4 py-7 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-center gap-3 text-center sm:flex-row sm:gap-0">
+          {trustStrip.map((item, index) => (
+            <div className="flex items-center" key={item}>
+              {index > 0 ? (
+                <span className="mx-5 hidden h-4 w-px bg-[#d9cfbd] sm:block" />
+              ) : null}
+              <span className="text-sm font-medium text-[#6b665d]">
+                {item}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section
+        className="scroll-mt-24 px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
+        id="demo"
+      >
+        <div className="mx-auto max-w-6xl rounded-lg border border-[#e3d8c5] bg-[#fffdf8] p-4 shadow-2xl shadow-[#c8bda8]/20 sm:p-6 lg:p-8">
           <div className="mb-6 max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
               Interactive demo
             </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-normal text-slate-950 sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-semibold tracking-normal text-[#15140f] sm:text-4xl">
               Try the resume tailoring demo
             </h2>
-            <p className="mt-3 text-base leading-7 text-slate-700">
+            <p className="mt-3 text-base leading-7 text-[#6b665d]">
               Use the example or paste your own resume and job description.
             </p>
           </div>
 
           <section className="grid gap-5 lg:grid-cols-2">
-            <label className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-[#fbfaf7] p-4">
-              <span className="text-sm font-semibold text-slate-900">
+            <label className="flex flex-col gap-3 rounded-lg border border-[#e3d8c5] bg-[#fbf6ea] p-4 shadow-sm">
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6b665d]">
                 Current Resume
               </span>
               <textarea
-                className="h-[240px] resize-y rounded-lg border border-gray-200 bg-white p-4 text-sm leading-6 text-slate-900 shadow-inner shadow-slate-100/60 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-300 lg:h-[300px]"
+                className="h-[240px] resize-y rounded-md border border-[#ded3c1] bg-white/85 p-4 text-sm leading-6 text-[#15140f] shadow-inner shadow-[#d7cbb8]/30 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-300 lg:h-[300px]"
                 placeholder="Paste your current resume here..."
                 value={resume}
                 onChange={(event) => setResume(event.target.value)}
               />
             </label>
 
-            <label className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-[#fbfaf7] p-4">
-              <span className="text-sm font-semibold text-slate-900">
+            <label className="flex flex-col gap-3 rounded-lg border border-[#e3d8c5] bg-[#fbf6ea] p-4 shadow-sm">
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6b665d]">
                 Job Description
               </span>
               <textarea
-                className="h-[240px] resize-y rounded-lg border border-gray-200 bg-white p-4 text-sm leading-6 text-slate-900 shadow-inner shadow-slate-100/60 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-300 lg:h-[300px]"
+                className="h-[240px] resize-y rounded-md border border-[#ded3c1] bg-white/85 p-4 text-sm leading-6 text-[#15140f] shadow-inner shadow-[#d7cbb8]/30 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-300 lg:h-[300px]"
                 placeholder="Paste the target job description here..."
                 value={jobDescription}
                 onChange={(event) => setJobDescription(event.target.value)}
@@ -373,15 +431,18 @@ export default function Home() {
 
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
             <button
-              className="lift-on-hover inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+              className="lift-on-hover inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#15140f] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-[#d9cfbd] disabled:text-[#777168] disabled:shadow-none"
               disabled={!canSubmit || loading}
               onClick={handleSubmit}
               type="button"
             >
               {loading ? (
-                <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+                <Loader2
+                  aria-hidden="true"
+                  className="h-4 w-4 animate-spin text-emerald-200"
+                />
               ) : null}
-              {loading ? "Tailoring Resume..." : "Tailor Resume"}
+              {loading ? "Tailoring resume..." : "Tailor Resume"}
             </button>
 
             <button
@@ -393,13 +454,12 @@ export default function Home() {
             </button>
 
             <button
-              className="lift-on-hover inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+              className="lift-on-hover inline-flex min-h-11 items-center justify-center rounded-md border border-[#d9cfbd] bg-white/80 px-5 py-2.5 text-sm font-semibold text-[#15140f] hover:bg-white"
               onClick={handleClear}
               type="button"
             >
               Clear
             </button>
-
           </div>
 
           <section className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
@@ -415,7 +475,7 @@ export default function Home() {
                   {error}
                 </p>
                 <button
-                  className="lift-on-hover mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+                  className="lift-on-hover mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-[#15140f] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-[#d9cfbd] disabled:text-[#777168] disabled:shadow-none"
                   disabled={!canSubmit || loading}
                   onClick={handleTryAgain}
                   type="button"
@@ -423,26 +483,26 @@ export default function Home() {
                   {loading ? (
                     <Loader2
                       aria-hidden="true"
-                      className="h-4 w-4 animate-spin"
+                      className="h-4 w-4 animate-spin text-emerald-200"
                     />
                   ) : null}
-                  {loading ? "Trying Again..." : "Try Again"}
+                  {loading ? "Tailoring resume..." : "Try Again"}
                 </button>
               </div>
             ) : (
               <>
-                <div className="rounded-lg border border-slate-200 bg-[#fbfaf7] p-4">
-                  <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="rounded-lg border border-[#e3d8c5] bg-[#fbf6ea] p-4 shadow-sm">
+                  <div className="flex flex-col gap-3 border-b border-[#e3d8c5] pb-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-950">
+                      <h2 className="text-lg font-semibold text-[#15140f]">
                         Tailored Resume
                       </h2>
-                      <p className="mt-1 text-sm text-slate-600">
+                      <p className="mt-1 text-sm text-[#6b665d]">
                         Tailored resume draft, ready to review and copy.
                       </p>
                     </div>
                     <button
-                      className="lift-on-hover inline-flex min-h-10 items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-400 disabled:shadow-none"
+                      className="lift-on-hover inline-flex min-h-10 items-center justify-center rounded-md border border-[#d9cfbd] bg-white/85 px-4 py-2 text-sm font-semibold text-[#15140f] hover:bg-white disabled:cursor-not-allowed disabled:text-[#9c9489] disabled:shadow-none"
                       disabled={!tailoredResume}
                       onClick={handleCopy}
                       type="button"
@@ -451,41 +511,41 @@ export default function Home() {
                     </button>
                   </div>
 
-                  <div className="mt-4 max-h-[520px] min-h-[260px] overflow-auto rounded-lg border border-slate-200 bg-white p-5 text-sm leading-relaxed text-slate-900 shadow-sm sm:p-6">
+                  <div className="mt-4 max-h-[520px] min-h-[260px] overflow-auto rounded-md border border-[#e3d8c5] bg-white p-5 text-sm leading-7 text-[#15140f] shadow-sm sm:p-6">
                     <div className="whitespace-pre-wrap">
                       {tailoredResume ||
                         (loading ? (
-                          <span className="inline-flex items-center gap-2 text-slate-600">
+                          <span className="inline-flex items-center gap-2 text-[#6b665d]">
                             <Loader2
                               aria-hidden="true"
                               className="h-4 w-4 animate-spin text-emerald-700"
                             />
-                            Generating a tailored resume...
+                            Tailoring resume...
                           </span>
                         ) : (
-                          "Your tailored resume will appear here."
+                          "Your tailored resume will appear here after generation."
                         ))}
                     </div>
                   </div>
                 </div>
 
-                <aside className="rounded-lg border border-slate-200 bg-[#fbfaf7] p-4">
-                  <h2 className="text-lg font-semibold text-slate-950">
+                <aside className="rounded-lg border border-[#e3d8c5] bg-[#fbf6ea] p-4 shadow-sm">
+                  <h2 className="text-lg font-semibold text-[#15140f]">
                     Change Notes
                   </h2>
-                  <p className="mt-1 text-sm text-slate-600">
+                  <p className="mt-1 text-sm text-[#6b665d]">
                     Why the rewrite changed and what it matched.
                   </p>
 
                   {changeNotes.length > 0 ? (
-                    <ul className="mt-4 list-disc space-y-3 pl-5 text-sm leading-6 text-slate-700">
+                    <ul className="mt-4 list-disc space-y-3 pl-5 text-sm leading-6 text-[#5c554c]">
                       {changeNotes.map((note) => (
                         <li key={note}>{note}</li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="mt-4 text-sm leading-6 text-slate-600">
-                      Notes about what changed and why will appear here.
+                    <p className="mt-4 text-sm leading-6 text-[#6b665d]">
+                      Change notes will explain what was rewritten and why.
                     </p>
                   )}
                 </aside>
@@ -495,13 +555,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
+      <section className="px-4 py-16 sm:px-6 lg:px-8" id="how-it-works">
+        <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
-            <h2 className="text-3xl font-semibold tracking-normal text-slate-950">
+            <h2 className="text-3xl font-semibold tracking-normal text-[#15140f]">
               How it works
             </h2>
-            <p className="mt-3 text-base leading-7 text-slate-700">
+            <p className="mt-3 text-base leading-7 text-[#6b665d]">
               A simple flow for turning a generic resume into a role-aware
               draft.
             </p>
@@ -512,21 +572,21 @@ export default function Home() {
 
               return (
                 <article
-                  className="lift-on-hover rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+                  className="lift-on-hover rounded-lg border border-[#e3d8c5] bg-[#fffdf8] p-5 shadow-sm shadow-[#c8bda8]/10"
                   key={item.title}
                 >
                   <div className="flex items-center gap-3">
                     <span className="grid h-10 w-10 place-items-center rounded-md bg-emerald-50 text-emerald-800">
                       <Icon aria-hidden="true" className="h-5 w-5" />
                     </span>
-                    <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[#777168]">
                       Step {index + 1}
                     </span>
                   </div>
-                  <h3 className="mt-5 text-lg font-semibold text-slate-950">
+                  <h3 className="mt-5 text-lg font-semibold text-[#15140f]">
                     {item.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-700">
+                  <p className="mt-2 text-sm leading-6 text-[#6b665d]">
                     {item.body}
                   </p>
                 </article>
@@ -537,12 +597,12 @@ export default function Home() {
       </section>
 
       <section className="px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
-            <h2 className="text-3xl font-semibold tracking-normal text-slate-950">
+            <h2 className="text-3xl font-semibold tracking-normal text-[#15140f]">
               Why it is different
             </h2>
-            <p className="mt-3 text-base leading-7 text-slate-700">
+            <p className="mt-3 text-base leading-7 text-[#6b665d]">
               Tailor Fit is built around honesty first, then optimization.
             </p>
           </div>
@@ -552,16 +612,16 @@ export default function Home() {
 
               return (
                 <article
-                  className="lift-on-hover rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+                  className="lift-on-hover rounded-lg border border-[#e3d8c5] bg-[#fffdf8] p-5 shadow-sm shadow-[#c8bda8]/10"
                   key={item.title}
                 >
                   <span className="grid h-10 w-10 place-items-center rounded-md bg-emerald-50 text-emerald-800">
                     <Icon aria-hidden="true" className="h-5 w-5" />
                   </span>
-                  <h3 className="mt-5 text-lg font-semibold text-slate-950">
+                  <h3 className="mt-5 text-lg font-semibold text-[#15140f]">
                     {item.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-700">
+                  <p className="mt-2 text-sm leading-6 text-[#6b665d]">
                     {item.body}
                   </p>
                 </article>
@@ -571,8 +631,8 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-200 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl text-sm font-medium text-slate-600">
+      <footer className="border-t border-[#e8dfcf] px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl text-sm font-medium text-[#6b665d]">
           Built for CodeStorm 2026 #2
         </div>
       </footer>

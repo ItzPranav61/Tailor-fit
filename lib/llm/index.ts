@@ -39,10 +39,18 @@ class FallbackProvider implements LlmProvider {
 export function getLlmProvider(): LlmProvider {
   const primaryName = process.env.LLM_PROVIDER || "gemini";
   const fallbackName = process.env.LLM_FALLBACK_PROVIDER;
+  const geminiModel = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 
   if (!isProviderName(primaryName)) {
     throw new Error(`Unsupported LLM_PROVIDER: ${primaryName}`);
   }
+
+  console.info("[Tailor Fit] LLM provider selected", {
+    GEMINI_API_KEY_EXISTS: Boolean(process.env.GEMINI_API_KEY),
+    GEMINI_FALLBACK_MODEL: process.env.GEMINI_FALLBACK_MODEL,
+    GEMINI_MODEL: geminiModel,
+    LLM_PROVIDER: primaryName,
+  });
 
   const fallback =
     fallbackName && isProviderName(fallbackName) && fallbackName !== primaryName

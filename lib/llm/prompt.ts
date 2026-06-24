@@ -21,6 +21,10 @@ Hard rules:
   indirectly supported.
 - Missing or weakly supported skills must be represented honestly in the change
   notes, not fabricated into the resume.
+- Do not use hedging words such as "potentially", "possibly", "likely", or
+  "may have" inside the rewritten resume. If a skill or requirement is only
+  indirectly supported, keep that uncertainty in the change notes only and do
+  not put it in the resume body.
 - If the job description requests something unsupported by the resume, do not
   fabricate it. Leave that gap alone.
 - Preserve all factual content, including employers, dates, titles, locations,
