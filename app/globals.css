@@ -20,3 +20,99 @@ button,
 textarea {
   font: inherit;
 }
+
+textarea,
+[class*="overflow-auto"] {
+  scrollbar-color: #34d399 #f1f5f9;
+  scrollbar-width: thin;
+}
+
+textarea::-webkit-scrollbar,
+[class*="overflow-auto"]::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+textarea::-webkit-scrollbar-track,
+[class*="overflow-auto"]::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 999px;
+}
+
+textarea::-webkit-scrollbar-thumb,
+[class*="overflow-auto"]::-webkit-scrollbar-thumb {
+  background: #34d399;
+  border-radius: 999px;
+}
+
+.lift-on-hover {
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    color 200ms ease,
+    transform 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lift-on-hover:hover:not(:disabled) {
+    box-shadow:
+      0 10px 15px -3px rgb(15 23 42 / 0.1),
+      0 4px 6px -4px rgb(15 23 42 / 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+.hero-original {
+  animation: originalFade 900ms ease-out 500ms both;
+}
+
+.hero-original p:last-child {
+  text-decoration: line-through;
+  text-decoration-color: #64748b;
+  text-decoration-thickness: 1px;
+}
+
+.hero-tailored {
+  animation: tailoredReveal 900ms ease-out 1100ms both;
+}
+
+.hero-note {
+  animation: noteReveal 700ms ease-out 1900ms both;
+}
+
+@keyframes originalFade {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0.72;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes tailoredReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes noteReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

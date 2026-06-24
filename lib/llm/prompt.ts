@@ -27,7 +27,10 @@ Hard rules:
   education, credentials, and scope of experience.
 - Keep the resume truthful. You may rephrase, reorder, tighten, and emphasize
   existing evidence, but you may not add new facts.
-- Output the full rewritten resume in clean markdown.
+- Output the full rewritten resume as plain text only. Do not use markdown
+  headers such as "#", "##", or "###"; do not use bold syntax such as "**";
+  and do not use markdown bullet syntax except plain hyphens for experience
+  lines.
 - Also output 3 to 8 concise change notes explaining what changed and why,
   each tied to a specific job-description requirement or phrase.
 `.trim();
