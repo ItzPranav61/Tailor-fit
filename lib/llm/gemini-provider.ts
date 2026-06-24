@@ -11,8 +11,10 @@ import {
 import type { LlmProvider, TailorRequest } from "./types";
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL;
 const MAX_ATTEMPTS = 3;
 const BACKOFF_MS = [500, 1_000, 2_000];
+const EMPTY_RESPONSE_ERROR = "Gemini returned an empty response.";
 
 const geminiResponseSchema = {
   type: Type.OBJECT,
@@ -66,6 +68,13 @@ function isTransientProviderError(error: unknown) {
   return false;
 }
 
+function isRetryableGeminiError(error: unknown) {
+  return (
+    isTransientProviderError(error) ||
+    (error instanceof Error && error.message === EMPTY_RESPONSE_ERROR)
+  );
+}
+
 export class GeminiProvider implements LlmProvider {
   async tailor(input: TailorRequest) {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -76,36 +85,36 @@ export class GeminiProvider implements LlmProvider {
 
     const client = new GoogleGenAI({ apiKey });
 
+    try {
+      return await this.tailorWithRetries(client, input, GEMINI_MODEL);
+    } catch (error) {
+      if (
+        !GEMINI_FALLBACK_MODEL ||
+        GEMINI_FALLBACK_MODEL === GEMINI_MODEL ||
+        !isRetryableGeminiError(error)
+      ) {
+        throw error;
+      }
+
+      console.warn(
+        "Gemini primary model failed with retryable errors; trying fallback model once.",
+      );
+
+      return this.tailorOnce(client, input, GEMINI_FALLBACK_MODEL);
+    }
+  }
+
+  private async tailorWithRetries(
+    client: GoogleGenAI,
+    input: TailorRequest,
+    model: string,
+  ) {
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), LLM_TIMEOUT_MS);
-
       try {
-        const response = await client.models.generateContent({
-          model: GEMINI_MODEL,
-          contents: buildTailorUserPrompt(input.resume, input.jobDescription),
-          config: {
-            abortSignal: controller.signal,
-            systemInstruction: TAILOR_SYSTEM_PROMPT,
-            maxOutputTokens: MAX_OUTPUT_TOKENS,
-            responseMimeType: "application/json",
-            responseSchema: geminiResponseSchema,
-          },
-        });
-
-        const responseText = response.text ?? "";
-
-        if (!responseText.trim()) {
-          throw new Error("Gemini returned an empty response.");
-        }
-
-        return tailorResultSchema.parse(parseJsonObject(responseText));
+        return await this.tailorOnce(client, input, model);
       } catch (error) {
         const shouldRetry =
-          attempt < MAX_ATTEMPTS &&
-          (isTransientProviderError(error) ||
-            (error instanceof Error &&
-              error.message === "Gemini returned an empty response."));
+          attempt < MAX_ATTEMPTS && isRetryableGeminiError(error);
 
         if (!shouldRetry) {
           throw error;
@@ -116,11 +125,42 @@ export class GeminiProvider implements LlmProvider {
         );
 
         await sleep(BACKOFF_MS[attempt - 1]);
-      } finally {
-        clearTimeout(timeout);
       }
     }
 
     throw new Error("Gemini provider failed after retries.");
+  }
+
+  private async tailorOnce(
+    client: GoogleGenAI,
+    input: TailorRequest,
+    model: string,
+  ) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), LLM_TIMEOUT_MS);
+
+    try {
+      const response = await client.models.generateContent({
+        model,
+        contents: buildTailorUserPrompt(input.resume, input.jobDescription),
+        config: {
+          abortSignal: controller.signal,
+          systemInstruction: TAILOR_SYSTEM_PROMPT,
+          maxOutputTokens: MAX_OUTPUT_TOKENS,
+          responseMimeType: "application/json",
+          responseSchema: geminiResponseSchema,
+        },
+      });
+
+      const responseText = response.text ?? "";
+
+      if (!responseText.trim()) {
+        throw new Error(EMPTY_RESPONSE_ERROR);
+      }
+
+      return tailorResultSchema.parse(parseJsonObject(responseText));
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 }

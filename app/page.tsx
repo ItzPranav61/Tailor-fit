@@ -24,6 +24,42 @@ Education
 const exampleJobDescription =
   "We are hiring a Web Developer Intern with experience in React, Next.js, Tailwind CSS, frontend development, database integration, and deploying projects. The candidate should be able to build clean UI, work with APIs, and create practical web applications.";
 
+const heroBadges = [
+  "No fake skills",
+  "Change notes included",
+  "Built for job seekers",
+];
+
+const howItWorks = [
+  {
+    title: "Paste your resume",
+    body: "Start with the experience you already have, from projects to education.",
+  },
+  {
+    title: "Add the job description",
+    body: "Tailor Fit reads the role requirements, keywords, and priorities.",
+  },
+  {
+    title: "Get an honest tailored version",
+    body: "Receive a rewritten resume plus notes explaining each important change.",
+  },
+];
+
+const differentiators = [
+  {
+    title: "Does not invent experience",
+    body: "The prompt is designed to preserve facts and avoid unsupported skills.",
+  },
+  {
+    title: "Explains what changed",
+    body: "Change notes show how the rewrite maps to the job description.",
+  },
+  {
+    title: "Helps you tailor faster",
+    body: "Use the example, paste your own text, and iterate quickly before applying.",
+  },
+];
+
 export default function Home() {
   const [resume, setResume] = useState("");
   const [jobDescription, setJobDescription] = useState("");
@@ -129,137 +165,321 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f5ef] px-4 py-8 text-zinc-950 sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
-        <header className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
-            Resume tailoring
-          </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-normal text-zinc-950 sm:text-5xl">
-            Tailor Fit
-          </h1>
-          <p className="mt-4 text-lg leading-8 text-zinc-700">
-            Rewrite your resume for a job description without inventing fake
-            experience.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {[
-              "No fake skills",
-              "No invented experience",
-              "Change notes included",
-            ].map((badge) => (
-              <span
-                className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800"
-                key={badge}
-              >
-                {badge}
-              </span>
-            ))}
+    <main className="min-h-screen bg-[#f7f5ef] text-slate-950">
+      <nav className="sticky top-0 z-20 border-b border-slate-200/80 bg-[#f7f5ef]/95 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <a className="flex items-center gap-3" href="#">
+            <span className="grid h-9 w-9 place-items-center rounded-md bg-slate-950 text-sm font-bold text-white">
+              TF
+            </span>
+            <span className="text-base font-semibold text-slate-950">
+              Tailor Fit
+            </span>
+          </a>
+
+          <div className="flex items-center gap-2">
+            <a
+              className="rounded-md px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-white hover:text-slate-950"
+              href="#demo"
+            >
+              Demo
+            </a>
+            <a
+              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-emerald-300 hover:text-emerald-800"
+              href="https://github.com/ItzPranav61/Tailor-fit"
+              rel="noreferrer"
+              target="_blank"
+            >
+              GitHub
+            </a>
           </div>
-        </header>
-
-        <section className="grid gap-5 lg:grid-cols-2">
-          <label className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-            <span className="text-sm font-semibold text-zinc-900">
-              Current Resume
-            </span>
-            <textarea
-              className="h-[240px] resize-y rounded-md border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-900 outline-none transition focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-100 lg:h-[300px]"
-              placeholder="Paste your current resume here..."
-              value={resume}
-              onChange={(event) => setResume(event.target.value)}
-            />
-          </label>
-
-          <label className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-            <span className="text-sm font-semibold text-zinc-900">
-              Job Description
-            </span>
-            <textarea
-              className="h-[240px] resize-y rounded-md border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-900 outline-none transition focus:border-emerald-600 focus:bg-white focus:ring-2 focus:ring-emerald-100 lg:h-[300px]"
-              placeholder="Paste the target job description here..."
-              value={jobDescription}
-              onChange={(event) => setJobDescription(event.target.value)}
-            />
-          </label>
-        </section>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <button
-            className="inline-flex min-h-11 items-center justify-center rounded-md bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 disabled:shadow-none"
-            disabled={!canSubmit || loading}
-            onClick={handleSubmit}
-            type="button"
-          >
-            {loading ? "Tailoring Resume..." : "Tailor Resume"}
-          </button>
-
-          <button
-            className="inline-flex min-h-11 items-center justify-center rounded-md border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100"
-            onClick={handleTryExample}
-            type="button"
-          >
-            Try Example
-          </button>
-
-          <button
-            className="inline-flex min-h-11 items-center justify-center rounded-md border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-800 transition hover:bg-zinc-50"
-            onClick={handleClear}
-            type="button"
-          >
-            Clear
-          </button>
-
-          {error ? (
-            <p className="text-sm font-medium text-red-700" role="alert">
-              {error}
-            </p>
-          ) : null}
         </div>
+      </nav>
 
-        <section className="grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
-          <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-            <div className="flex flex-col gap-3 border-b border-zinc-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
-              <h2 className="text-lg font-semibold text-zinc-950">
-                Tailored Resume
-              </h2>
-              <button
-                className="inline-flex min-h-10 items-center justify-center rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-800 transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:text-zinc-400"
-                disabled={!tailoredResume}
-                onClick={handleCopy}
-                type="button"
-              >
-                {copied ? "Copied!" : "Copy Tailored Resume"}
-              </button>
+      <section className="px-4 pb-10 pt-12 sm:px-6 sm:pb-14 sm:pt-16 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)] lg:items-center">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+              Honest resume tailoring
+            </p>
+            <h1 className="mt-4 max-w-4xl text-4xl font-semibold leading-tight tracking-normal text-slate-950 sm:text-5xl lg:text-6xl">
+              Tailor your resume to any job description — without faking
+              experience.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-700">
+              Paste your resume and a job description. Tailor Fit rewrites your
+              resume to match the role, explains what changed, and keeps your
+              experience honest.
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-2">
+              {heroBadges.map((badge) => (
+                <span
+                  className="rounded-full border border-emerald-200 bg-white px-3 py-1 text-xs font-semibold text-emerald-800 shadow-sm"
+                  key={badge}
+                >
+                  {badge}
+                </span>
+              ))}
             </div>
 
-            <pre className="mt-4 min-h-[260px] whitespace-pre-wrap rounded-md bg-zinc-50 p-4 text-sm leading-7 text-zinc-900">
-              {tailoredResume ||
-                (loading
-                  ? "Generating a tailored resume..."
-                  : "Your tailored resume will appear here.")}
-            </pre>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a
+                className="inline-flex min-h-12 items-center justify-center rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800"
+                href="#demo"
+              >
+                Try Demo
+              </a>
+              <a
+                className="inline-flex min-h-12 items-center justify-center rounded-md border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-emerald-300 hover:text-emerald-800"
+                href="https://github.com/ItzPranav61/Tailor-fit"
+                rel="noreferrer"
+                target="_blank"
+              >
+                View GitHub
+              </a>
+            </div>
           </div>
 
-          <aside className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-            <h2 className="text-lg font-semibold text-zinc-950">
-              Change Notes
-            </h2>
+          <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/70">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                  Live workflow
+                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-950">
+                  Resume rewrite preview
+                </p>
+              </div>
+              <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800">
+                Honest rewrite
+              </span>
+            </div>
+            <div className="mt-5 space-y-3">
+              <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs font-semibold text-slate-500">
+                  Original bullet
+                </p>
+                <p className="mt-2 text-sm leading-6 text-slate-800">
+                  Built BuildNest using Next.js, Tailwind CSS, Supabase,
+                  PostgreSQL, and Vercel.
+                </p>
+              </div>
+              <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4">
+                <p className="text-xs font-semibold text-emerald-700">
+                  Tailored bullet
+                </p>
+                <p className="mt-2 text-sm leading-6 text-slate-900">
+                  Developed a deployed Next.js opportunity board with Tailwind
+                  CSS, Supabase, PostgreSQL, and Vercel to support practical web
+                  application workflows.
+                </p>
+              </div>
+              <div className="rounded-md border border-slate-200 bg-white p-4">
+                <p className="text-xs font-semibold text-slate-500">
+                  Change note
+                </p>
+                <p className="mt-2 text-sm leading-6 text-slate-700">
+                  Emphasized deployed web app and database integration because
+                  the role asks for practical frontend projects.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            {changeNotes.length > 0 ? (
-              <ul className="mt-4 list-disc space-y-3 pl-5 text-sm leading-6 text-zinc-700">
-                {changeNotes.map((note) => (
-                  <li key={note}>{note}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-4 text-sm leading-6 text-zinc-600">
-                Notes about what changed and why will appear here.
+      <section className="px-4 py-6 sm:px-6 lg:px-8" id="demo">
+        <div className="mx-auto max-w-7xl rounded-lg border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/60 sm:p-6 lg:p-8">
+          <div className="mb-6 max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+              Interactive demo
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-normal text-slate-950 sm:text-4xl">
+              Try the resume tailoring demo
+            </h2>
+            <p className="mt-3 text-base leading-7 text-slate-700">
+              Use the example or paste your own resume and job description.
+            </p>
+          </div>
+
+          <section className="grid gap-5 lg:grid-cols-2">
+            <label className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-[#fbfaf7] p-4">
+              <span className="text-sm font-semibold text-slate-900">
+                Current Resume
+              </span>
+              <textarea
+                className="h-[240px] resize-y rounded-md border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 lg:h-[300px]"
+                placeholder="Paste your current resume here..."
+                value={resume}
+                onChange={(event) => setResume(event.target.value)}
+              />
+            </label>
+
+            <label className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-[#fbfaf7] p-4">
+              <span className="text-sm font-semibold text-slate-900">
+                Job Description
+              </span>
+              <textarea
+                className="h-[240px] resize-y rounded-md border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-900 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 lg:h-[300px]"
+                placeholder="Paste the target job description here..."
+                value={jobDescription}
+                onChange={(event) => setJobDescription(event.target.value)}
+              />
+            </label>
+          </section>
+
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <button
+              className="inline-flex min-h-11 items-center justify-center rounded-md bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+              disabled={!canSubmit || loading}
+              onClick={handleSubmit}
+              type="button"
+            >
+              {loading ? "Tailoring Resume..." : "Tailor Resume"}
+            </button>
+
+            <button
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100"
+              onClick={handleTryExample}
+              type="button"
+            >
+              Try Example
+            </button>
+
+            <button
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
+              onClick={handleClear}
+              type="button"
+            >
+              Clear
+            </button>
+
+            {error ? (
+              <p className="text-sm font-medium text-red-700" role="alert">
+                {error}
               </p>
-            )}
-          </aside>
-        </section>
-      </div>
+            ) : null}
+          </div>
+
+          <section className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
+            <div className="rounded-lg border border-slate-200 bg-[#fbfaf7] p-4">
+              <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-950">
+                    Tailored Resume
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Tailored resume draft, ready to review and copy.
+                  </p>
+                </div>
+                <button
+                  className="inline-flex min-h-10 items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-400"
+                  disabled={!tailoredResume}
+                  onClick={handleCopy}
+                  type="button"
+                >
+                  {copied ? "Copied!" : "Copy Tailored Resume"}
+                </button>
+              </div>
+
+              <pre className="mt-4 max-h-[520px] min-h-[260px] overflow-auto whitespace-pre-wrap rounded-md border border-slate-200 bg-white p-4 text-sm leading-7 text-slate-900">
+                {tailoredResume ||
+                  (loading
+                    ? "Generating a tailored resume..."
+                    : "Your tailored resume will appear here.")}
+              </pre>
+            </div>
+
+            <aside className="rounded-lg border border-slate-200 bg-[#fbfaf7] p-4">
+              <h2 className="text-lg font-semibold text-slate-950">
+                Change Notes
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Why the rewrite changed and what it matched.
+              </p>
+
+              {changeNotes.length > 0 ? (
+                <ul className="mt-4 list-disc space-y-3 pl-5 text-sm leading-6 text-slate-700">
+                  {changeNotes.map((note) => (
+                    <li key={note}>{note}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 text-sm leading-6 text-slate-600">
+                  Notes about what changed and why will appear here.
+                </p>
+              )}
+            </aside>
+          </section>
+        </div>
+      </section>
+
+      <section className="px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-2xl">
+            <h2 className="text-3xl font-semibold tracking-normal text-slate-950">
+              How it works
+            </h2>
+            <p className="mt-3 text-base leading-7 text-slate-700">
+              A simple flow for turning a generic resume into a role-aware
+              draft.
+            </p>
+          </div>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {howItWorks.map((item, index) => (
+              <article
+                className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+                key={item.title}
+              >
+                <span className="grid h-9 w-9 place-items-center rounded-md bg-emerald-50 text-sm font-bold text-emerald-800">
+                  {index + 1}
+                </span>
+                <h3 className="mt-5 text-lg font-semibold text-slate-950">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">
+                  {item.body}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-2xl">
+            <h2 className="text-3xl font-semibold tracking-normal text-slate-950">
+              Why it is different
+            </h2>
+            <p className="mt-3 text-base leading-7 text-slate-700">
+              Tailor Fit is built around honesty first, then optimization.
+            </p>
+          </div>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {differentiators.map((item) => (
+              <article
+                className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+                key={item.title}
+              >
+                <h3 className="text-lg font-semibold text-slate-950">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">
+                  {item.body}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-slate-200 px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl text-sm font-medium text-slate-600">
+          Built for CodeStorm 2026 #2
+        </div>
+      </footer>
     </main>
   );
 }

@@ -38,14 +38,14 @@ class FallbackProvider implements LlmProvider {
 
 export function getLlmProvider(): LlmProvider {
   const primaryName = process.env.LLM_PROVIDER || "gemini";
-  const fallbackName = process.env.LLM_FALLBACK_PROVIDER || "openai";
+  const fallbackName = process.env.LLM_FALLBACK_PROVIDER;
 
   if (!isProviderName(primaryName)) {
     throw new Error(`Unsupported LLM_PROVIDER: ${primaryName}`);
   }
 
   const fallback =
-    isProviderName(fallbackName) && fallbackName !== primaryName
+    fallbackName && isProviderName(fallbackName) && fallbackName !== primaryName
       ? createProvider(fallbackName)
       : undefined;
 
