@@ -1,4 +1,4 @@
-# Tailor Fit — Project Brain
+# Tailor Fit - Project Brain
 
 ## 1. Project Identity
 
@@ -11,7 +11,7 @@ Tailor Fit helps users paste their current resume and a target job description. 
 
 The main promise:
 
-> Tailor your resume to any job description — without faking experience.
+> Tailor your resume to any job description without faking experience.
 
 Tailor Fit is not a fake resume generator. It is an honest rewriting assistant.
 
@@ -239,7 +239,7 @@ The AI prompt must strongly enforce:
 * Do not invent achievements.
 * Do not convert implied knowledge into direct claimed experience.
 * If something is indirectly supported, explain it in change notes.
-* Do not use uncertain words like “potentially” inside the resume body.
+* Do not use uncertain words like "potentially" inside the resume body.
 * Missing or weakly supported skills should be handled honestly.
 
 Example:
@@ -393,7 +393,7 @@ Honest AI resume tailoring.
 Short description:
 
 ```txt
-Tailor Fit rewrites resumes for job descriptions while keeping the user’s real experience honest and unchanged.
+Tailor Fit rewrites resumes for job descriptions while keeping the user's real experience honest and unchanged.
 ```
 
 Problem it solves:
@@ -427,7 +427,7 @@ Tailor Fit helps students and job seekers tailor their resume for a specific job
 
 The user pastes their current resume and the target job description. The app rewrites the resume to better match the role and also explains what changed through change notes.
 
-The key difference is honesty. Tailor Fit does not invent fake skills, fake metrics, or fake experience. It only rephrases and highlights what is already supported by the user’s resume.
+The key difference is honesty. Tailor Fit does not invent fake skills, fake metrics, or fake experience. It only rephrases and highlights what is already supported by the user's resume.
 
 We also handled AI reliability. If Gemini quota is temporarily unavailable, the app does not fake output for custom input. It only shows a clearly labeled offline fallback for the built-in demo so reviewers can still understand the product flow.
 ```
@@ -452,6 +452,7 @@ Custom input during quota failure shows quota message
 Edited Try Example during quota failure does not use fallback
 No fake metrics appear
 No fake skills appear
+Gemini API key rotated if any real key was ever committed
 Vercel live deployment works
 Devfolio links work
 ```
@@ -483,7 +484,7 @@ Do not add:
 
 The MVP is already enough.
 
-Do not break the working flow chasing “one more feature.”
+Do not break the working flow chasing "one more feature."
 
 ---
 

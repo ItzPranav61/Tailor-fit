@@ -14,7 +14,7 @@ export const openAiResponseJsonSchema = {
   properties: {
     tailoredResume: {
       type: "string",
-      description: "The full rewritten resume in clean markdown.",
+      description: "The full rewritten resume in clean plain text.",
     },
     changeNotes: {
       type: "array",

@@ -49,7 +49,7 @@ const geminiResponseSchema = {
   properties: {
     tailoredResume: {
       type: Type.STRING,
-      description: "The full rewritten resume in clean markdown.",
+      description: "The full rewritten resume in clean plain text.",
     },
     changeNotes: {
       type: Type.ARRAY,

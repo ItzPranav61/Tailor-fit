@@ -4,7 +4,7 @@ Tailor Fit rewrites a resume against a target job description while keeping the 
 
 ## Live Demo
 
-[Open Tailor Fit on Vercel](https://tailor-gbaadqh74-itzpranav61s-projects.vercel.app/)
+[Open Tailor Fit on Vercel](https://tailor-fit-eight.vercel.app/)
 
 ## Why It Is Different
 
@@ -105,7 +105,12 @@ See `.env.example` for the full list.
 - `OPENAI_API_KEY`: optional, only needed if using OpenAI locally
 - `OPENAI_MODEL`: optional OpenAI model setting
 
-Real `.env` and `.env.local` files are ignored by git.
+Real `.env` and `.env.local` files are ignored by git. Keep real API keys out
+of `.env.example` and public commits.
+
+If a real API key was ever committed, rotate it in the provider dashboard before
+sharing the repository publicly. Removing it in a later commit does not remove it
+from git history.
 
 ## Known Limitations
 

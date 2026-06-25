@@ -98,6 +98,7 @@ export default function Home() {
   const [changeNotes, setChangeNotes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [copyError, setCopyError] = useState("");
   const [copied, setCopied] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -134,6 +135,7 @@ export default function Home() {
     setTailoredResume("");
     setChangeNotes([]);
     setError("");
+    setCopyError("");
     setCopied(false);
   }
 
@@ -208,7 +210,37 @@ export default function Home() {
     }
 
     try {
-      await navigator.clipboard.writeText(tailoredResume);
+      let copiedToClipboard = false;
+
+      if (navigator.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(tailoredResume);
+          copiedToClipboard = true;
+        } catch {
+          copiedToClipboard = false;
+        }
+      }
+
+      if (!copiedToClipboard) {
+        const textArea = document.createElement("textarea");
+        textArea.value = tailoredResume;
+        textArea.setAttribute("readonly", "");
+        textArea.style.left = "-9999px";
+        textArea.style.position = "fixed";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        copiedToClipboard = document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        if (!copiedToClipboard) {
+          throw new Error("Legacy clipboard copy failed.");
+        }
+      }
+
+      setCopyError("");
       setCopied(true);
       setShowCopyToast(true);
       window.setTimeout(() => {
@@ -216,7 +248,9 @@ export default function Home() {
         setShowCopyToast(false);
       }, 1800);
     } catch {
-      setError("Copy failed. Please select and copy the tailored resume text.");
+      setCopyError(
+        "Copy failed. Please select and copy the tailored resume text.",
+      );
     }
   }
 
@@ -303,7 +337,7 @@ export default function Home() {
               Honest resume tailoring
             </p>
             <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.04] tracking-normal text-[#15140f] sm:text-6xl lg:text-7xl">
-              Tailor your resume to any job description — without faking
+              Tailor your resume to any job description without faking
               experience.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-[#6b665d]">
@@ -530,6 +564,11 @@ export default function Home() {
                       {copied ? "Copied!" : "Copy Tailored Resume"}
                     </button>
                   </div>
+                  {copyError ? (
+                    <p className="mt-3 text-sm font-medium text-red-700">
+                      {copyError}
+                    </p>
+                  ) : null}
 
                   <div className="mt-4 max-h-[520px] min-h-[260px] overflow-auto rounded-md border border-[#e3d8c5] bg-white p-5 text-sm leading-7 text-[#15140f] shadow-sm sm:p-6">
                     <div className="whitespace-pre-wrap">
