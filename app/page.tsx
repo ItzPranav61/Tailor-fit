@@ -172,16 +172,20 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        if (response.status === 400) {
-          const data = (await response.json().catch(() => null)) as
-            | ErrorResponse
-            | null;
+        const data = (await response.json().catch(() => null)) as
+          | ErrorResponse
+          | null;
 
+        if (response.status === 400) {
           setError(data?.message || "Please check your resume and job description.");
           return;
         }
 
-        throw new Error("Tailor request failed.");
+        setError(
+          data?.message ||
+            "We could not tailor your resume right now. Please try again shortly.",
+        );
+        return;
       }
 
       const data = (await response.json()) as TailorResponse;

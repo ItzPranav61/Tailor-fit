@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { getLlmProvider } from "../../../lib/llm";
+import { LlmQuotaUnavailableError } from "../../../lib/llm/types";
 
 const RESUME_MIN_LENGTH = 50;
 const RESUME_MAX_LENGTH = 15_000;
@@ -59,7 +60,21 @@ export async function POST(request: Request) {
     const result = await getLlmProvider().tailor(parsedRequest.data);
 
     return NextResponse.json(result, { status: 200 });
-  } catch {
+  } catch (error) {
+    if (error instanceof LlmQuotaUnavailableError) {
+      console.error(
+        "Tailor API LLM quota unavailable; returning safe quota message.",
+      );
+
+      return NextResponse.json(
+        {
+          message:
+            "AI quota is temporarily unavailable. Please try again later or use the example demo.",
+        },
+        { status: 502 },
+      );
+    }
+
     console.error(
       "Tailor API LLM provider failure; returning safe 502 response. See provider logs for details.",
     );

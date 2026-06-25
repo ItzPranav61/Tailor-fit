@@ -8,7 +8,12 @@ import {
   parseJsonObject,
   tailorResultSchema,
 } from "./shared";
-import type { LlmProvider, TailorRequest, TailorResult } from "./types";
+import {
+  LlmQuotaUnavailableError,
+  type LlmProvider,
+  type TailorRequest,
+  type TailorResult,
+} from "./types";
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
 const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL;
@@ -17,6 +22,17 @@ const BACKOFF_MS = [500, 1_000, 2_000];
 const EMPTY_RESPONSE_ERROR = "Gemini returned an empty response.";
 const OFFLINE_DEMO_NOTICE =
   "Offline demo fallback shown because AI quota is temporarily unavailable.";
+const SAMPLE_RESUME = `Pranav Sawant
+
+Experience
+- Built BuildNest, an opportunity board for student developers using Next.js, Tailwind CSS, Supabase, PostgreSQL, and Vercel.
+- Added search and filtering for opportunities and created detail pages with external links.
+- Worked on Aaspas, a hyperlocal community app with locality onboarding, local posts, groups, and business discovery.
+
+Education
+- BSc IT 2nd Year Student, Maharashtra`;
+const SAMPLE_JOB_DESCRIPTION =
+  "We are hiring a Web Developer Intern with experience in React, Next.js, Tailwind CSS, frontend development, database integration, and deploying projects. The candidate should be able to build clean UI, work with APIs, and create practical web applications.";
 
 const offlineDemoFallback: TailorResult = {
   tailoredResume: `${OFFLINE_DEMO_NOTICE}
@@ -170,6 +186,34 @@ function logOfflineFallback(error: unknown, model: string) {
   });
 }
 
+function isBuiltInExample(input: TailorRequest) {
+  return (
+    input.resume.trim() === SAMPLE_RESUME.trim() &&
+    input.jobDescription.trim() === SAMPLE_JOB_DESCRIPTION.trim()
+  );
+}
+
+function handleQuotaFailure(
+  error: unknown,
+  input: TailorRequest,
+  model: string,
+) {
+  if (!isGeminiQuotaError(error)) {
+    return undefined;
+  }
+
+  if (isBuiltInExample(input)) {
+    logOfflineFallback(error, model);
+    return offlineDemoFallback;
+  }
+
+  console.warn("[Tailor Fit] Gemini quota unavailable for custom input", {
+    error: getErrorSummary(error),
+    model,
+  });
+  throw new LlmQuotaUnavailableError();
+}
+
 export class GeminiProvider implements LlmProvider {
   async tailor(input: TailorRequest) {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -188,9 +232,10 @@ export class GeminiProvider implements LlmProvider {
         GEMINI_FALLBACK_MODEL === GEMINI_MODEL ||
         !isRetryableGeminiError(error)
       ) {
-        if (isGeminiQuotaError(error)) {
-          logOfflineFallback(error, GEMINI_MODEL);
-          return offlineDemoFallback;
+        const quotaFallback = handleQuotaFailure(error, input, GEMINI_MODEL);
+
+        if (quotaFallback) {
+          return quotaFallback;
         }
 
         throw error;
@@ -210,9 +255,14 @@ export class GeminiProvider implements LlmProvider {
           1,
         );
 
-        if (isGeminiQuotaError(fallbackError)) {
-          logOfflineFallback(fallbackError, GEMINI_FALLBACK_MODEL);
-          return offlineDemoFallback;
+        const quotaFallback = handleQuotaFailure(
+          fallbackError,
+          input,
+          GEMINI_FALLBACK_MODEL,
+        );
+
+        if (quotaFallback) {
+          return quotaFallback;
         }
 
         throw fallbackError;
