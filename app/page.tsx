@@ -101,6 +101,7 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isExampleDemo, setIsExampleDemo] = useState(false);
 
   const canSubmit = resume.trim().length > 0 && jobDescription.trim().length > 0;
 
@@ -168,6 +169,7 @@ export default function Home() {
         body: JSON.stringify({
           resume: trimmedResume,
           jobDescription: trimmedJobDescription,
+          isExampleDemo,
         }),
       });
 
@@ -221,13 +223,25 @@ export default function Home() {
   function handleClear() {
     setResume("");
     setJobDescription("");
+    setIsExampleDemo(false);
     resetOutputState();
   }
 
   function handleTryExample() {
     setResume(exampleResume);
     setJobDescription(exampleJobDescription);
+    setIsExampleDemo(true);
     resetOutputState();
+  }
+
+  function handleResumeChange(value: string) {
+    setResume(value);
+    setIsExampleDemo(false);
+  }
+
+  function handleJobDescriptionChange(value: string) {
+    setJobDescription(value);
+    setIsExampleDemo(false);
   }
 
   function handleTryAgain() {
@@ -416,7 +430,7 @@ export default function Home() {
                 className="h-[240px] resize-y rounded-md border border-[#ded3c1] bg-white/85 p-4 text-sm leading-6 text-[#15140f] shadow-inner shadow-[#d7cbb8]/30 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-300 lg:h-[300px]"
                 placeholder="Paste your current resume here..."
                 value={resume}
-                onChange={(event) => setResume(event.target.value)}
+                onChange={(event) => handleResumeChange(event.target.value)}
               />
             </label>
 
@@ -428,7 +442,9 @@ export default function Home() {
                 className="h-[240px] resize-y rounded-md border border-[#ded3c1] bg-white/85 p-4 text-sm leading-6 text-[#15140f] shadow-inner shadow-[#d7cbb8]/30 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-emerald-300 lg:h-[300px]"
                 placeholder="Paste the target job description here..."
                 value={jobDescription}
-                onChange={(event) => setJobDescription(event.target.value)}
+                onChange={(event) =>
+                  handleJobDescriptionChange(event.target.value)
+                }
               />
             </label>
           </section>

@@ -1,4 +1,8 @@
-export type TailorRequest = { resume: string; jobDescription: string };
+export type TailorRequest = {
+  resume: string;
+  jobDescription: string;
+  isExampleDemo?: boolean;
+};
 export type TailorResult = { tailoredResume: string; changeNotes: string[] };
 
 export class LlmQuotaUnavailableError extends Error {

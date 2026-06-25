@@ -26,6 +26,7 @@ const tailorRequestSchema = z.object({
       JOB_DESCRIPTION_MAX_LENGTH,
       "Job description must be 10,000 characters or fewer.",
     ),
+  isExampleDemo: z.boolean().optional(),
 });
 
 function validationMessage(error: z.ZodError): string {
