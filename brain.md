@@ -99,6 +99,7 @@ Tailor Fit should NOT:
 * Gemini provider integration
 * Gemini primary model
 * Gemini fallback model
+* Optional Groq real AI fallback
 * Quota/rate-limit detection
 * Safe provider error handling
 * Try Example-only offline fallback
@@ -123,6 +124,7 @@ Backend:
 AI:
 
 * Google Gemini via `@google/genai`
+* Groq chat completions as an optional real AI fallback
 * OpenAI SDK support exists but is optional and not required by default
 
 Deployment:
@@ -271,28 +273,33 @@ GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-2.5-flash-lite
 GEMINI_FALLBACK_MODEL=gemini-2.0-flash
 
+GROQ_API_KEY=your_groq_api_key_here_optional
+GROQ_MODEL=llama-3.1-8b-instant
+
 OPENAI_API_KEY=your_openai_api_key_here_optional
 OPENAI_MODEL=gpt-5.4-mini
 ```
 
-Gemini behavior:
+Default real-provider order:
 
 1. Try `GEMINI_MODEL`.
-2. Retry transient errors.
-3. If primary model fails due to transient issue, try `GEMINI_FALLBACK_MODEL`.
-4. If quota/rate-limit `429` happens and `isExampleDemo === true`, use offline demo fallback.
-5. If quota/rate-limit `429` happens and `isExampleDemo === false`, return safe quota message.
-6. Unknown provider failures return generic safe message.
+2. Retry transient Gemini errors.
+3. If the primary Gemini model fails due to transient issue, try `GEMINI_FALLBACK_MODEL`.
+4. If Gemini models fail and `GROQ_API_KEY` is configured, try `GROQ_MODEL` as a real AI fallback.
+5. If real providers are unavailable and `isExampleDemo === true`, use the clearly labeled offline demo fallback.
+6. If real providers are unavailable and `isExampleDemo === false`, return a safe error message.
+7. Unknown provider failures return generic safe message.
 
 ---
 
 ## 13. Offline Demo Fallback Rules
 
-Offline fallback exists only to keep the hackathon demo reviewable when Gemini quota is exhausted.
+Offline fallback exists only to keep the hackathon demo reviewable when real AI
+providers are unavailable.
 
 It must only trigger when:
 
-* Gemini returns confirmed quota/rate-limit `429`
+* Real providers are unavailable due quota, rate limit, or provider failure
 * `isExampleDemo === true`
 
 It must NOT trigger when:
@@ -301,8 +308,7 @@ It must NOT trigger when:
 * User edited the Try Example text
 * API key is missing
 * Validation fails
-* Model output is malformed
-* Unknown provider error happens
+* Real AI fallback is available and succeeds
 
 Fallback output must:
 
@@ -333,7 +339,7 @@ Resume must be at least 50 characters.
 Job description must be at least 50 characters.
 ```
 
-### Gemini quota error with custom input
+### Real provider quota error with custom input
 
 Show:
 
@@ -411,7 +417,7 @@ Challenges:
 ```txt
 The biggest challenge was making the AI useful without making it dishonest. Resume tools can easily exaggerate experience, so we created strict prompt rules to prevent fake skills, tools, metrics, titles, or achievements.
 
-Another challenge was AI reliability. Gemini sometimes returned quota or rate-limit errors, so we added retry handling, a Gemini fallback model, and a clearly labeled quota-only offline fallback to keep the demo reviewable without pretending the AI worked.
+Another challenge was AI reliability. Gemini sometimes returned quota or rate-limit errors, so we added retry handling, a Gemini fallback model, optional Groq real AI fallback, and a clearly labeled offline fallback for the built-in demo to keep the demo reviewable without pretending the AI worked for custom input.
 
 We also improved the frontend from a basic tool into a polished landing-page style product with a clear demo flow, trust badges, loading states, copy feedback, and clean output sections.
 ```
@@ -429,7 +435,7 @@ The user pastes their current resume and the target job description. The app rew
 
 The key difference is honesty. Tailor Fit does not invent fake skills, fake metrics, or fake experience. It only rephrases and highlights what is already supported by the user's resume.
 
-We also handled AI reliability. If Gemini quota is temporarily unavailable, the app does not fake output for custom input. It only shows a clearly labeled offline fallback for the built-in demo so reviewers can still understand the product flow.
+We also handled AI reliability. If Gemini is temporarily unavailable, the app can try Groq as a real AI fallback. If real providers still are not available, it does not fake output for custom input. It only shows a clearly labeled offline fallback for the built-in demo so reviewers can still understand the product flow.
 ```
 
 ---
@@ -517,6 +523,7 @@ Current status:
 * Backend working
 * Gemini integration added
 * Gemini fallback model added
+* Optional Groq real AI fallback added
 * Quota-specific UX added
 * Try Example-only offline fallback added
 * README updated

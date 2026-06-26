@@ -12,6 +12,16 @@ export class LlmQuotaUnavailableError extends Error {
   }
 }
 
+export class LlmProviderFailureError extends Error {
+  readonly status?: number;
+
+  constructor(message: string, status?: number) {
+    super(message);
+    this.name = "LlmProviderFailureError";
+    this.status = status;
+  }
+}
+
 export interface LlmProvider {
   tailor(input: TailorRequest): Promise<TailorResult>;
 }

@@ -21,6 +21,7 @@ The app returns two things:
 - TypeScript
 - Tailwind CSS
 - Google Gemini via `@google/genai`
+- Groq chat completions as an optional real AI fallback
 - OpenAI SDK support kept optional
 - Zod request validation
 
@@ -59,17 +60,23 @@ GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-2.5-flash-lite
 GEMINI_FALLBACK_MODEL=gemini-2.0-flash
 
+GROQ_API_KEY=your_groq_api_key_here_optional
+GROQ_MODEL=llama-3.1-8b-instant
+
 OPENAI_API_KEY=your_openai_api_key_here_optional
 OPENAI_MODEL=gpt-5.4-mini
 ```
 
-For the default Gemini setup, only `GEMINI_API_KEY` is required. OpenAI support exists for optional local experiments if `LLM_PROVIDER=openai`, but it is not required.
+For the default Gemini setup, only `GEMINI_API_KEY` is required. For stronger
+demo reliability, add `GROQ_API_KEY` too; Groq is used as a real AI fallback
+after the Gemini primary and fallback models fail. OpenAI support exists for
+optional local experiments if `LLM_PROVIDER=openai`, but it is not required.
 
-Tailor Fit uses the real Gemini API by default. If Gemini returns a confirmed
-quota or rate-limit `429`, the app may show a clearly labeled offline demo
-fallback so the hackathon flow remains reviewable. That fallback only triggers
-when the built-in Try Example demo was used, and it is not a replacement for the
-real AI tailoring path.
+Tailor Fit uses real AI providers by default. The default order is Gemini
+primary model, Gemini fallback model, Groq fallback model, and finally the
+clearly labeled offline demo fallback only for the built-in Try Example flow if
+real providers are unavailable. Custom user input never receives fake fallback
+output.
 
 5. Start the dev server:
 
@@ -102,6 +109,8 @@ See `.env.example` for the full list.
 - `GEMINI_API_KEY`: required for the default Gemini provider
 - `GEMINI_MODEL`: primary Gemini model
 - `GEMINI_FALLBACK_MODEL`: optional Gemini fallback model
+- `GROQ_API_KEY`: optional, enables Groq as a real AI fallback
+- `GROQ_MODEL`: optional Groq model setting
 - `OPENAI_API_KEY`: optional, only needed if using OpenAI locally
 - `OPENAI_MODEL`: optional OpenAI model setting
 
@@ -116,8 +125,9 @@ from git history.
 
 - Gemini free-tier models can return temporary rate-limit or high-demand errors.
 - The fallback model uses the same Gemini API key, so it can still fail if that key has no quota for the fallback model.
-- If Gemini quota is exhausted, Tailor Fit can return a clearly labeled offline
-  demo fallback only for the built-in Try Example demo.
+- Groq fallback is optional and only works when `GROQ_API_KEY` is configured.
+- If real providers are unavailable, Tailor Fit can return a clearly labeled
+  offline demo fallback only for the built-in Try Example demo.
 - Tailor Fit does not store resumes, add authentication, or provide file upload in this MVP.
 - The AI output should still be reviewed by the user before sending a job application.
 
