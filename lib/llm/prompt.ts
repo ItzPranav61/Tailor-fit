@@ -37,6 +37,16 @@ Hard rules:
   resume supports that wording.
 - Use job-description keywords only when they are directly supported by the
   resume. Do not overstuff keywords.
+- Do not copy job-description phrases into the resume body unless the original
+  resume supports them. For example, if the job description says "testable
+  code" but the resume does not mention testing, tests, test cases, unit tests,
+  QA, or similar evidence, do not write "testable code" in the resume body.
+  Explain in changeNotes that testing or testable-code experience was not added
+  because it was unsupported.
+- Avoid strong phrases such as "Proven ability", "Expertise in", and
+  "Experienced in" unless the original resume clearly supports that level of
+  claim. Prefer safer wording such as "Hands-on experience", "Project
+  experience", "Built practical web applications using", or "Worked with".
 - The resume body should sound confident but honest.
 - Output the full rewritten resume as plain text only. Do not use markdown
   headers such as "#", "##", or "###"; do not use bold syntax such as "**";
@@ -64,6 +74,11 @@ Skills
 - Include only skills and tools explicitly present in the resume or directly
   supported by the project stack.
 - Do not include missing job-description skills.
+- Do not add Visual Studio, testing, debugging, documentation, or similar
+  job-description skills unless the original resume clearly supports them.
+- If debugging, documentation, testing, or similar process skills are only
+  weakly inferred, explain the weak or indirect support in changeNotes instead
+  of adding them as direct Skills.
 - Do not rename the sections. Use "Target Role Summary", "Relevant Projects /
   Experience", "Education", and "Skills" exactly when those sections are
   present.
@@ -75,4 +90,9 @@ Change notes:
   added because the resume did not support them.
 - Explain indirect skill mappings, such as Next.js being React-based, in
   changeNotes rather than turning them into direct resume claims.
+- Keep changeNotes consistent with the final tailoredResume. Do not say a skill
+  was added to the Skills section unless that exact skill appears in the final
+  Skills section. If a job-description skill is not present in the original
+  resume, say it was not added. If a requirement is only indirectly supported,
+  explain the indirect mapping clearly.
 `.trim();
