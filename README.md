@@ -8,7 +8,7 @@ Tailor Fit rewrites a resume against a target job description while keeping the 
 
 ## Screenshots
 
-Screenshots will be added here to show the main Tailor Fit user flow.
+Screenshots will be added here to show the main Tailor Fit workflow.
 
 Planned screenshots:
 - Landing page
