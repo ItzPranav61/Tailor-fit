@@ -15,6 +15,15 @@ The app returns two things:
 - A tailored resume draft
 - Change notes explaining what changed and why
 
+## Features
+
+* Paste an existing resume and target job description
+* Generate an honesty-first tailored resume draft
+* Show change notes so users understand what was edited
+* Prevent unsupported claims, fake skills, and invented experience
+* Use Gemini as the primary AI provider with optional Groq fallback
+* Provide a built-in demo flow for quick testing
+
 ## Tech Stack
 
 - Next.js App Router
