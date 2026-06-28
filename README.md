@@ -6,6 +6,16 @@ Tailor Fit rewrites a resume against a target job description while keeping the 
 
 [Open Tailor Fit on Vercel](https://tailor-fit-eight.vercel.app/)
 
+## Screenshots
+
+Screenshots will be added here to show the main Tailor Fit user flow.
+
+Planned screenshots:
+- Landing page
+- Resume and job description input form
+- Tailored resume output
+- Change notes output
+
 ## Why It Is Different
 
 Most resume tools try to optimize for keywords first. Tailor Fit is honesty-first: it can rephrase supported experience to better match a role, but it should not invent skills, tools, titles, metrics, or work the user did not provide.
